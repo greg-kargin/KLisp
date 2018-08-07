@@ -1,6 +1,8 @@
 package MakeALisp
 
-fun readString() {}
+fun readString(str : String) : Expr {
+    return readExpr(tokenize(str)).first
+}
 
 fun tokenize(str : String) : Tokens {
     val matcher = Regex("""[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)""")
@@ -8,7 +10,6 @@ fun tokenize(str : String) : Tokens {
 }
 
 fun readList(tokens : Tokens) : Pair<EList, Tokens> {
-
     val acc : MutableList<Expr> = mutableListOf()
     var tokens = tokens
 
@@ -24,12 +25,18 @@ fun readList(tokens : Tokens) : Pair<EList, Tokens> {
     }
 }
 
+fun determineAtom(token : String) : EAtom {
+    return when {
+        token.chars().allMatch(Character::isDigit) -> ENum(token.toInt())
+        else -> ESymbol(token)
+    }
+}
+
 fun readAtom(tokens : Tokens) : Pair<EAtom, Tokens> {
-    return Pair(parseEAtom(tokens.first()), tokens.drop(1))
+    return Pair(determineAtom(tokens.first()), tokens.drop(1))
 }
 
 fun readExpr(tokens : Tokens) : Pair<Expr, Tokens> {
-    print(tokens.first() + (tokens.first() == "("))
     return if (tokens.first() == "(") {
         readList(tokens.drop(1))
     } else {
