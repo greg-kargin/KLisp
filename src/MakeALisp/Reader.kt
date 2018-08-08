@@ -1,5 +1,7 @@
 package MakeALisp
 
+typealias Tokens = List<Token>
+
 fun readString(str : String) : Expr {
     return readExpr(tokenize(str)).first
 }
@@ -25,15 +27,8 @@ fun readList(tokens : Tokens) : Pair<EList, Tokens> {
     }
 }
 
-fun determineAtom(token : String) : EAtom {
-    return when {
-        token.chars().allMatch(Character::isDigit) -> ENum(token.toInt())
-        else -> ESymbol(token)
-    }
-}
-
 fun readAtom(tokens : Tokens) : Pair<EAtom, Tokens> {
-    return Pair(determineAtom(tokens.first()), tokens.drop(1))
+    return Pair(parseEAtom(tokens.first()), tokens.drop(1))
 }
 
 fun readExpr(tokens : Tokens) : Pair<Expr, Tokens> {
@@ -45,7 +40,8 @@ fun readExpr(tokens : Tokens) : Pair<Expr, Tokens> {
 }
 
 fun main(args: Array<String>) {
-    val tokens = tokenize("(foo (bar (baz)))")
+    val tokens = tokenize("(nil true false 42 baz)")
+    Thread.sleep(1000)
     val exprs = readExpr(tokens)
 
     print(tokens)
