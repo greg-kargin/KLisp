@@ -1,5 +1,7 @@
 package MakeALisp
 
+import kotlin.text.StringBuilder
+
 typealias Token = String
 
 interface Expr { fun print() : String }
@@ -47,9 +49,30 @@ fun parseESymbol(token : Token) : ESymbol? {
     return ESymbol(token)
 }
 
-// todo
 fun parseEString(token : Token) : EString? {
-    return null
+    if (token.first() != '\"' && token.last() != '\'') return null
+    val token = token.drop(1).dropLast(1)
+    val sb = StringBuilder()
+
+    var idx = 0
+    while (idx < token.length) {
+        val c = token[idx]
+        if (c == '\\') {
+            // todo handle parsing errors
+            assert(idx + 1 < token.length)
+            when (token[idx + 1]) {
+                '\\' -> sb.append('\\')
+                'n'  -> sb.append('\n')
+                't'  -> sb.append('\t')
+                else -> error("unknown escape sequence in string literal")
+            }
+            idx += 2
+        } else {
+            sb.append(c)
+            idx += 1
+        }
+    }
+    return EString(sb.toString())
 }
 
 fun parseETrue(token : Token) : ETrue? {
