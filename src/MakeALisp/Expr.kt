@@ -8,15 +8,15 @@ interface Expr { fun print() : String }
 interface EAtom : Expr
 interface EBool : EAtom
 
-class ENum(val value : Number) : EAtom {
+data class ENum(val value : Long) : EAtom {
     override fun print() : String = value.toString()
 }
 
-class ESymbol(val value : String) : EAtom {
+data class ESymbol(val value : String) : EAtom {
     override fun print() : String = value
 }
 
-class EString(val value : String) : EAtom {
+data class EString(val value : String) : EAtom {
     override fun print() : String = value
 }
 
@@ -32,7 +32,10 @@ class ENil : EAtom {
     override fun print() : String = "nil"
 }
 
-class EList(val elements : List<Expr>) : Expr {
+data class EList(val elements : List<Expr>) : Expr {
+
+    operator fun get(i : Int): Expr = elements[i]
+
     override fun print(): String {
         return elements.fold("(", { acc, expr -> acc + " " + expr.print()}) + " )"
     }
@@ -40,7 +43,7 @@ class EList(val elements : List<Expr>) : Expr {
 
 fun parseENum(token : Token) : ENum? {
     return when {
-        token.chars().allMatch(Character::isDigit) -> ENum(token.toInt())
+        token.chars().allMatch(Character::isDigit) -> ENum(token.toLong())
         else -> null
     }
 }

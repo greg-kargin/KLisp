@@ -1,14 +1,14 @@
 package MakeALisp
 
-fun eval(e: Expr) : Expr = e
-
 fun repl() {
+    val env = initialEnv()
+
     while (true) {
         val raw = readLine() ?: "exit"
         if (raw == "exit" || raw == "quit") return
         if (raw != "") {
-            val ast = readString(raw)
-            val res = eval(ast)
+            val ast = read(raw)
+            val res = eval(ast, env)
             println(res.print())
         }
     }
