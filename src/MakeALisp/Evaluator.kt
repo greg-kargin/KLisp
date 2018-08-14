@@ -1,10 +1,14 @@
 package MakeALisp
 
-typealias Invokable = (Expr, Expr) -> Expr
+typealias Invokable = (List<Expr>) -> Expr
 typealias Env = Map<ESymbol, Invokable>
 
-fun basicNumOp(sym : String, fn : (Long, Long) -> Long) : Pair<ESymbol, (Expr, Expr) -> Expr> {
-    return Pair(ESymbol(sym), { x : Expr, y : Expr -> ENum(fn((x as ENum).value, (y as ENum).value))})
+fun basicNumOp(sym : String, fn : (Long, Long) -> Long) : Pair<ESymbol, (List<Expr>) -> Expr> {
+    return Pair(ESymbol(sym), { args: List<Expr> ->
+        ENum(args.stream()
+                .map { e: Expr? -> (e as ENum).value }
+                .reduce(fn).get())
+    })
 }
 
 fun initialEnv() : Env = mutableMapOf(
@@ -15,8 +19,7 @@ fun initialEnv() : Env = mutableMapOf(
         basicNumOp("rem", Long::rem))
 
 fun eval(e: Expr, env: Env) : Expr = when {
-
     e is EAtom -> e
-    e is EList -> (env[e[0]] as Invokable).invoke(eval(e[1], env), eval(e[2], env))
+    e is EList -> (env[e[0]] as Invokable).invoke(e.elements.drop(1).map { elem -> eval(elem, env) })
     else -> ENil()
 }
