@@ -25,15 +25,15 @@ data class EString(val value : String) : EAtom {
     override fun print() : String = value
 }
 
-class ETrue : EBool {
+object ETrue : EBool {
     override fun print() : String = "true"
 }
 
-class EFalse : EBool {
+object EFalse : EBool {
     override fun print() : String = "false"
 }
 
-class ENil : EAtom {
+object ENil : EAtom {
     override fun print() : String = "nil"
 }
 
@@ -84,15 +84,15 @@ fun parseEString(token : Token) : EString? {
 }
 
 fun parseETrue(token : Token) : ETrue? {
-    return if (token == "true") ETrue() else null
+    return if (token == "true") ETrue else null
 }
 
 fun parseEFalse(token : Token) : EFalse? {
-    return if (token == "false") EFalse() else null
+    return if (token == "false") EFalse else null
 }
 
 fun parseENil(token : Token) : ENil? {
-    return if (token == "nil") ENil() else null
+    return if (token == "nil") ENil else null
 }
 
 fun parseEAtom(token : String) : EAtom {

@@ -2,15 +2,15 @@ package MakeALisp
 
 class Env {
 
-    private val table : Map<ESymbol, Expr>
+    private val table : MutableMap<ESymbol, Expr>
     private val outer : Env?
 
     constructor(outer: Env) {
-        this.table = mapOf()
+        this.table = mutableMapOf()
         this.outer = outer
     }
 
-    constructor(table: Map<ESymbol, Expr>) {
+    constructor(table: MutableMap<ESymbol, Expr>) {
         this.table = table
         this.outer = null
     }
@@ -23,9 +23,13 @@ class Env {
             else -> null
         }
     }
+
+    operator fun set(sym : ESymbol, value : Expr) {
+        table[sym] = value
+    }
 }
 
-fun basicNumOp(sym : String, fn : (Long, Long) -> Long) : Pair<ESymbol, Expr> {
+fun varargNumOp(sym : String, fn : (Long, Long) -> Long) : Pair<ESymbol, Expr> {
     return Pair(ESymbol(sym), EFn({ args: List<Expr> ->
         ENum(args.stream()
                  .map { e: Expr? -> (e as ENum).value }
@@ -33,9 +37,19 @@ fun basicNumOp(sym : String, fn : (Long, Long) -> Long) : Pair<ESymbol, Expr> {
     }))
 }
 
+fun varargEquals(args : List<Expr>) : Expr {
+    for (arg in args) {
+        if (arg != args[0]) {
+            return EFalse
+        }
+    }
+    return ETrue
+}
+
 fun initialEnv() : Env = Env(mutableMapOf(
-        basicNumOp("+", Long::plus),
-        basicNumOp("-", Long::minus),
-        basicNumOp("/", Long::div),
-        basicNumOp("*", Long::times),
-        basicNumOp("rem", Long::rem)))
+        varargNumOp("+", Long::plus),
+        varargNumOp("-", Long::minus),
+        varargNumOp("/", Long::div),
+        varargNumOp("*", Long::times),
+        varargNumOp("rem", Long::rem),
+        Pair(ESymbol("="), EFn(::varargEquals))))
