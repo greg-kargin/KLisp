@@ -1,6 +1,5 @@
 package MakeALisp
 
-import java.util.*
 import kotlin.text.StringBuilder
 
 typealias Token = String
@@ -8,6 +7,11 @@ typealias Token = String
 interface Expr { fun print() : String }
 interface EAtom : Expr
 interface EBool : EAtom
+
+data class EFn(val fn: (List<Expr>) -> Expr) : Expr {
+    override fun print() : String = fn.toString()
+    fun invoke(args : List<Expr>) : Expr = fn(args)
+}
 
 data class ENum(val value: Long) : EAtom {
     override fun print() : String = value.toString()
