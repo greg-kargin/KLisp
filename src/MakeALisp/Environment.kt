@@ -15,6 +15,11 @@ class Env {
         this.outer = null
     }
 
+    constructor(outer: Env, table: MutableMap<ESymbol, Expr>) {
+        this.outer = outer
+        this.table = table
+    }
+
     operator fun get(sym : ESymbol) : Expr? {
         val item = table[sym]
         return when {
@@ -32,7 +37,7 @@ class Env {
 fun varargNumOp(sym : String, fn : (Long, Long) -> Long) : Pair<ESymbol, Expr> {
     return Pair(ESymbol(sym), EFn({ args: List<Expr> ->
         ENum(args.stream()
-                 .map { e: Expr? -> (e as ENum).value }
+                 .map { e: Expr? -> (e as ENum?)!!.value }
                  .reduce(fn).get())
     }))
 }
