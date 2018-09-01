@@ -1,6 +1,6 @@
 package MakeALisp
 
-fun truthy(e: Expr): Boolean = e is ETrue || !(e is ENil)
+fun truthy(e: Expr): Boolean = (!(e is ENil)) && (!(e is EFalse))
 
 fun eval(e: Expr, env: Env) : Expr = when (e) {
     is ESymbol -> env[e]!!
