@@ -70,14 +70,6 @@ fun cons(args : List<Expr>) : Expr {
     return EList(list)
 }
 
-fun car(args : List<Expr>) : Expr {
-    return (args[0] as EList)[0]
-}
-
-fun cdr(args : List<Expr>) : Expr {
-    return EList((args[0] as EList).elements.drop(1))
-}
-
 fun initialEnv() : Env = Env(mutableMapOf(
         varargNumOp("+", Long::plus),
         varargNumOp("-", Long::minus),
@@ -89,6 +81,4 @@ fun initialEnv() : Env = Env(mutableMapOf(
         Pair(ESymbol("list"), EFn(::list)),
         Pair(ESymbol("list?"), EFn(::listHuh)),
         Pair(ESymbol("empty?"), EFn(::emptyHuh)),
-        Pair(ESymbol("cons"), EFn(::cons)),
-        Pair(ESymbol("car"), EFn(::car)),
-        Pair(ESymbol("cdr"), EFn(::cdr))))
+        Pair(ESymbol("cons"), EFn(::cons))))

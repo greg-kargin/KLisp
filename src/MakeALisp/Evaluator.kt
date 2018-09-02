@@ -6,12 +6,21 @@ fun eval(e: Expr, env: Env) : Expr = when (e) {
     is ESymbol -> env[e]!!
     is EAtom -> e
     is EList -> {
-        when ((e.elements[0] as ESymbol).value) {
-            "def!" -> {
+        val head = (e.elements[0] as ESymbol).value
+        when {
+            Regex("""c[a,d]+r""").matches(head) -> {
+                val opSeq = head.drop(1).dropLast(1)
+                opSeq.fold(eval(e.elements[1], env),
+                        {acc , op -> if (op == 'a')
+                            (acc as EList)[0]
+                        else
+                            EList((acc as EList).elements.drop(1)) })
+            }
+            head == "def!" -> {
                 env[e.elements[1] as ESymbol] = eval(e.elements[2], env)
                 e.elements[1]
             }
-            "let*" -> {
+            head == "let*" -> {
                 val newEnv = Env(env)
                 val bindings = e.elements[1]
                 (bindings as EList).elements
@@ -19,13 +28,13 @@ fun eval(e: Expr, env: Env) : Expr = when (e) {
                         .map { p -> newEnv[p[0] as ESymbol] = eval(p[1], newEnv)}
                 eval(e.elements[2], newEnv)
             }
-            "do" -> {
+            head == "do" -> {
                 e.elements
                         .drop(1)
                         .map { e -> eval(e, env) }
                         .last()
             }
-            "if" -> {
+            head == "if" -> {
                 val pred = e.elements[1]
                 val expr1 = e.elements[2]
                 val expr2 = e.elements[3]
@@ -37,7 +46,7 @@ fun eval(e: Expr, env: Env) : Expr = when (e) {
                     eval(expr2, env)
                 }
             }
-            "fn*" -> {
+            head == "fn*" -> {
                 val args = e.elements[1]
                 val body = e.elements[2]
 
