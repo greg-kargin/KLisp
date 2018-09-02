@@ -9,7 +9,7 @@ fun eval(e: Expr, env: Env) : Expr = when (e) {
         when ((e.elements[0] as ESymbol).value) {
             "def!" -> {
                 env[e.elements[1] as ESymbol] = eval(e.elements[2], env)
-                e.elements[2]
+                e.elements[1]
             }
             "let*" -> {
                 val newEnv = Env(env)

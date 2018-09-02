@@ -51,10 +51,44 @@ fun varargEquals(args : List<Expr>) : Expr {
     return ETrue
 }
 
+fun prnImpl(args : List<Expr>) : Expr {
+    println(args.map { expr: Expr -> expr.print() }.joinToString(" "))
+    return ENil
+}
+
+fun list(args : List<Expr>) : Expr = EList(args)
+
+fun listHuh(args : List<Expr>) : Expr = if (args[0] is EList) ETrue else EFalse
+
+fun emptyHuh(args : List<Expr>) : Expr = if ((args[0] as EList).elements.count() == 0) ETrue else EFalse
+
+fun cons(args : List<Expr>) : Expr {
+    val head = args[0]
+    val tail = (args[1] as EList).elements
+    val list = mutableListOf(head)
+    list.addAll(tail)
+    return EList(list)
+}
+
+fun car(args : List<Expr>) : Expr {
+    return (args[0] as EList)[0]
+}
+
+fun cdr(args : List<Expr>) : Expr {
+    return EList((args[0] as EList).elements.drop(1))
+}
+
 fun initialEnv() : Env = Env(mutableMapOf(
         varargNumOp("+", Long::plus),
         varargNumOp("-", Long::minus),
         varargNumOp("/", Long::div),
         varargNumOp("*", Long::times),
         varargNumOp("rem", Long::rem),
-        Pair(ESymbol("="), EFn(::varargEquals))))
+        Pair(ESymbol("="), EFn(::varargEquals)),
+        Pair(ESymbol("prn"), EFn(::prnImpl)),
+        Pair(ESymbol("list"), EFn(::list)),
+        Pair(ESymbol("list?"), EFn(::listHuh)),
+        Pair(ESymbol("empty?"), EFn(::emptyHuh)),
+        Pair(ESymbol("cons"), EFn(::cons)),
+        Pair(ESymbol("car"), EFn(::car)),
+        Pair(ESymbol("cdr"), EFn(::cdr))))
